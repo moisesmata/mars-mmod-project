@@ -29,12 +29,27 @@ class MarsAnalyzer final : public MarsAnalyzerComponentBase {
     // Handler implementations for commands
     // ----------------------------------------------------------------------
 
-    //! Handler implementation for command TODO
-    //!
-    //! TODO
-    void TODO_cmdHandler(FwOpcodeType opCode,  //!< The opcode
-                         U32 cmdSeq            //!< The command sequence number
-                         ) override;
+    //! Handler implementation for command START
+    void START_cmdHandler(FwOpcodeType opCode, U32 cmdSeq) override;
+
+    //! Handler implementation for command STOP
+    void STOP_cmdHandler(FwOpcodeType opCode, U32 cmdSeq) override;
+
+    //! Handler implementation for command RESET_PARSER
+    void RESET_PARSER_cmdHandler(FwOpcodeType opCode, U32 cmdSeq) override;
+
+    // ----------------------------------------------------------------------
+    // Handler implementations for typed input ports
+    // ----------------------------------------------------------------------
+
+    //! Handler implementation for managerFrameIn
+    void managerFrameIn_handler(FwIndexType portNum,
+                                U16 distanceCm,
+                                U16 signalStrength,
+                                I16 temperatureCentiC) override;
+
+  private:
+    U32 m_appFrameCount;
 };
 
 }  // namespace Mars

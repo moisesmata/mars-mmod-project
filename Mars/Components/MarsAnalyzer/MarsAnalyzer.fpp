@@ -1,11 +1,45 @@
 module Mars {
-    @ Active component that implements application logic for MMOD detection, interfaces with the a driver component for LiDAR
+    @ Active application component implementing mission-specific MMOD analysis logic
     active component MarsAnalyzer {
 
-        # One async command/port is required for active components
-        # This should be overridden by the developers with a useful command/port
-        @ TODO
-        async command TODO opcode 0
+        @ Start TF-Luna acquisition in the manager
+        async command START opcode 0
+
+        @ Stop TF-Luna acquisition in the manager
+        async command STOP opcode 1
+
+        @ Reset manager parser state and statistics
+        async command RESET_PARSER opcode 2
+
+        @ Control output to the TF-Luna manager
+        output port managerControlOut: Mars.TfLunaControl
+
+        @ Measurement input from the TF-Luna manager
+        sync input port managerFrameIn: Mars.TfLunaFrame
+
+        @ Latest distance from manager, in centimeters
+        telemetry AppDistanceCm: U16
+
+        @ Latest signal strength from manager
+        telemetry AppSignalStrength: U16
+
+        @ Latest temperature from manager, in centi-degrees Celsius
+        telemetry AppTemperatureCentiC: I16
+
+        @ Number of frames received from manager
+        telemetry AppFrameCount: U32
+
+        @ Acquisition started by command
+        event AcquisitionStarted severity activity high id 0 \
+          format "Application requested TF-Luna start"
+
+        @ Acquisition stopped by command
+        event AcquisitionStopped severity activity high id 1 \
+          format "Application requested TF-Luna stop"
+
+        @ Parser reset requested by command
+        event ParserResetRequested severity activity high id 2 \
+          format "Application requested TF-Luna parser reset"
 
         ##############################################################################
         #### Uncomment the following examples to start customizing your component ####

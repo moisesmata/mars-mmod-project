@@ -19,8 +19,8 @@ register_fprime_library(
         "${CMAKE_CURRENT_LIST_DIR}/MarsAnalyzer.fpp"
     SOURCES
         "${CMAKE_CURRENT_LIST_DIR}/MarsAnalyzer.cpp"
-#   DEPENDS
-#       MyPackage_MyOtherModule
+    DEPENDS
+        Mars_Components_Ports
 )
 
 ### Unit Tests ###
