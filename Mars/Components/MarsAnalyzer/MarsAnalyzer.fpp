@@ -17,30 +17,6 @@ module Mars {
         @ Measurement input from the TF-Luna manager
         sync input port managerFrameIn: Mars.TfLunaFrame
 
-        @ Latest distance from manager, in centimeters
-        telemetry AppDistanceCm: U16
-
-        @ Latest signal strength from manager
-        telemetry AppSignalStrength: U16
-
-        @ Latest temperature from manager, in centi-degrees Celsius
-        telemetry AppTemperatureCentiC: I16
-
-        @ Number of frames received from manager
-        telemetry AppFrameCount: U32
-
-        @ Acquisition started by command
-        event AcquisitionStarted severity activity high id 0 \
-          format "Application requested TF-Luna start"
-
-        @ Acquisition stopped by command
-        event AcquisitionStopped severity activity high id 1 \
-          format "Application requested TF-Luna stop"
-
-        @ Parser reset requested by command
-        event ParserResetRequested severity activity high id 2 \
-          format "Application requested TF-Luna parser reset"
-
         ##############################################################################
         #### Uncomment the following examples to start customizing your component ####
         ##############################################################################

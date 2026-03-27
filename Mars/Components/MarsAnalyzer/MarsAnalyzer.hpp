@@ -47,9 +47,6 @@ class MarsAnalyzer final : public MarsAnalyzerComponentBase {
                                 U16 distanceCm,
                                 U16 signalStrength,
                                 I16 temperatureCentiC) override;
-
-  private:
-    U32 m_appFrameCount;
 };
 
 }  // namespace Mars
