@@ -3,7 +3,6 @@ module Mars {
     enum TfLunaControlAction : U8 {
         START
         STOP
-        RESET_PARSER
     }
 
     @ Application to manager control interface

@@ -83,11 +83,6 @@ void TfLunaManager::CONTROL_cmdHandler(FwOpcodeType opCode,
         case Mars::TfLunaControlAction::STOP:
             this->enabled = false;
             break;
-        case Mars::TfLunaControlAction::RESET_PARSER:
-            this->distance = 0;
-            this->flux = 0;
-            this->temp = 0;
-            break;
         default:
             this->cmdResponse_out(opCode, cmdSeq, Fw::CmdResponse::VALIDATION_ERROR);
             return;

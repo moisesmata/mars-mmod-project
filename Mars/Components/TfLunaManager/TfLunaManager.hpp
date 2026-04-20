@@ -73,7 +73,7 @@ class TfLunaManager final : public TfLunaManagerComponentBase {
 
     void run_handler(FwIndexType portNum, U32 context) override;
 
-    //! Handler for the CONTROL command (START / STOP / RESET_PARSER)
+    //! Handler for the CONTROL command (START / STOP)
     void CONTROL_cmdHandler(FwOpcodeType opCode,
                             U32 cmdSeq,
                             Mars::TfLunaControlAction action) override;
