@@ -29,12 +29,8 @@ U32 rateGroup3Context[Svc::ActiveRateGroup::CONNECTION_COUNT_MAX] = {};
 
 enum TopologyConstants {
     COMM_PRIORITY = 34,
-    LIDAR_UART_PRIORITY = 35,
-    LIDAR_UART_ALLOCATION_SIZE = 1024,
 };
 
-const char* LIDAR_UART_DEVICE = "/dev/ttyUSB0";
-bool g_lidarUartStarted = false;
 
 /**
  * \brief configure/setup components in project-specific way
@@ -70,15 +66,9 @@ void setupTopology(const TopologyState& state) {
     if (state.hostname != nullptr && state.port != 0) {
         comDriver.configure(state.hostname, state.port);
     }
-    // Configure and start the TF-Luna UART driver.
-    if (lidarUartDriver.open(LIDAR_UART_DEVICE,
-                             Drv::LinuxUartDriver::UartBaudRate::BAUD_115K,
-                             Drv::LinuxUartDriver::UartFlowControl::NO_FLOW,
-                             Drv::LinuxUartDriver::UartParity::PARITY_NONE,
-                             LIDAR_UART_ALLOCATION_SIZE)) {
-        lidarUartDriver.start(LIDAR_UART_PRIORITY, Default::STACK_SIZE);
-        g_lidarUartStarted = true;
-    }
+
+    lidarI2cDriver.open("/dev/i2c-1");
+
     // Project-specific component configuration. Function provided above. May be inlined, if desired.
     configureTopology();
     // Autocoded parameter loading. Function provided by autocoder.
@@ -113,12 +103,6 @@ void teardownTopology(const TopologyState& state) {
     // Other task clean-up.
     comDriver.stop();
     (void)comDriver.join();
-
-    if (g_lidarUartStarted) {
-        lidarUartDriver.quitReadThread();
-        (void)lidarUartDriver.join();
-        g_lidarUartStarted = false;
-    }
 
     // Resource deallocation
     cmdSeq.deallocateBuffer(mallocator);

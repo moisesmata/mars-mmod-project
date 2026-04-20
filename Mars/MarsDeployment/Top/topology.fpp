@@ -32,9 +32,9 @@ module Mars {
     instance timer
     instance comDriver
     instance cmdSeq
-    instance marsAnalyzer
+    #instance marsAnalyzer
     instance tfLunaManager
-    instance lidarUartDriver
+    instance lidarI2cDriver
 
   # ----------------------------------------------------------------------
   # Pattern graph specifiers
@@ -132,19 +132,12 @@ module Mars {
 
     connections MarsDeployment {
       # Application <-> Manager
-      marsAnalyzer.managerControlOut -> tfLunaManager.controlIn
-      tfLunaManager.frameOut -> marsAnalyzer.managerFrameIn
+      #marsAnalyzer.managerControlOut -> tfLunaManager.controlIn
+      #tfLunaManager.frameOut -> marsAnalyzer.managerFrameIn
 
       # Manager <-> Linux UART driver
-      lidarUartDriver.$recv -> tfLunaManager.lidarDataIn
-      tfLunaManager.lidarDataReturnOut -> lidarUartDriver.recvReturnIn
-      lidarUartDriver.ready -> tfLunaManager.lidarDriverReady
-
-      # UART driver memory and telemetry/event integration
-      lidarUartDriver.allocate -> ComCcsds.commsBufferManager.bufferGetCallee
-      lidarUartDriver.deallocate -> ComCcsds.commsBufferManager.bufferSendIn
-
-      rateGroup1.RateGroupMemberOut[5] -> lidarUartDriver.run
+      tfLunaManager.read -> lidarI2cDriver.read
+      tfLunaManager.write -> lidarI2cDriver.write
     }
 
   }
