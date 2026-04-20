@@ -40,18 +40,26 @@ bool TfLunaManager::getData(){
 
     // Check the status of the read first
     if((status == Drv::I2cStatus::I2C_OK) && (buffer.getSize() == 6) && buffer.getData() != nullptr){
-        // Do the necessary bit shifting for the data
-        U8* raw = buffer.getData();
+        U8* raw_data = buffer.getData();
 
-        this->distance = raw[0] + (raw[1] << 8);
-        this->flux = raw[2] + (raw[3] << 8);
-        this->temp = raw[4] + (raw[5] << 8);
+        // Shift high byte over and add
+        this->distance = raw_data[0] + (raw_data[1] << 8);
+        this->flux = raw_data[2] + (raw_data[3] << 8);
+        this->temp = raw_data[4] + (raw_data[5] << 8);
 
         return true;
     }
 
     // Return false on bad read
     return false;
+};
+
+void TfLunaManager::run_handler(FwIndexType portNum, U32 context){
+    // On tick, log some data
+    this->getData();
+    this->tlmWrite_distance(this->distance);
+    this->tlmWrite_flux(this->flux);
+    this->tlmWrite_temperature(this->temp);
 };
 
 

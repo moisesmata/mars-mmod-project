@@ -138,6 +138,8 @@ module Mars {
       # Manager <-> Linux UART driver
       tfLunaManager.read -> lidarI2cDriver.read
       tfLunaManager.write -> lidarI2cDriver.write
+
+      rateGroup1.RateGroupMemberOut[5] -> tfLunaManager.run
     }
 
   }
