@@ -11,7 +11,7 @@
 
 #include "Mars/Components/TfLunaManager/TfLunaManagerComponentAc.hpp"
 
-namespace Mars {
+namespace Mars {  
 
 class TfLunaManager final : public TfLunaManagerComponentBase {
   public:
