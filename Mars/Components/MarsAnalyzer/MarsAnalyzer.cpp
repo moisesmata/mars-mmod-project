@@ -33,7 +33,7 @@ void MarsAnalyzer::managerFrameIn_handler(FwIndexType portNum,
     if (distanceCm > 0 && distanceCm <= threshold) {
         this->mmodCount++;
         this->tlmWrite_MmodCount(this->mmodCount);
-        this->log_WARNING_HI_MmodDetected(distanceCm, threshold);
+        this->log_WARNING_HI_MmodDetected(distanceCm);
     }
 }
 
