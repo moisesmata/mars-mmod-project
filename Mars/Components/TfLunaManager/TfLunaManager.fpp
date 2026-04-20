@@ -10,6 +10,18 @@ module Mars {
 
         sync input port run: Svc.Sched
 
+        @ Decoded frame pushed to the application layer every cycle
+        output port frameOut: Mars.TfLunaFrame
+
+        @ Control the TF-Luna acquisition loop (START, STOP, or RESET parser state)
+        sync command CONTROL($action: Mars.TfLunaControlAction) \
+            opcode 0
+
+        @ Emitted when the control command changes the manager state
+        event ControlActionApplied($action: Mars.TfLunaControlAction) \
+            severity activity low \
+            format "TfLuna control action applied: {}"
+
         telemetry distance: U32
 
         telemetry flux: U32

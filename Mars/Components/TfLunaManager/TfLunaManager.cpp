@@ -1,6 +1,6 @@
 // ======================================================================
 // \title  TfLunaManager.cpp
-// \author moisesm
+// \author moisesm, robertpendergrast
 // \brief  cpp file for TfLunaManager component implementation class
 // ======================================================================
 
@@ -43,9 +43,9 @@ bool TfLunaManager::getData(){
         U8* raw_data = buffer.getData();
 
         // Shift high byte over and add
-        this->distance = raw_data[0] + (raw_data[1] << 8);
-        this->flux = raw_data[2] + (raw_data[3] << 8);
-        this->temp = raw_data[4] + (raw_data[5] << 8);
+        this->distance = static_cast<U16>(raw_data[0] | (raw_data[1] << 8));
+        this->flux     = static_cast<U16>(raw_data[2] | (raw_data[3] << 8));
+        this->temp     = static_cast<I16>(raw_data[4] | (raw_data[5] << 8));
 
         return true;
     }
@@ -55,12 +55,47 @@ bool TfLunaManager::getData(){
 };
 
 void TfLunaManager::run_handler(FwIndexType portNum, U32 context){
-    // On tick, log some data
-    this->getData();
+    if (!this->enabled) {
+        return;
+    }
+
+    if (!this->getData()) {
+        return;
+    }
+
     this->tlmWrite_distance(this->distance);
     this->tlmWrite_flux(this->flux);
     this->tlmWrite_temperature(this->temp);
+
+    // Forward the decoded frame to another component if desired
+    if (this->isConnected_frameOut_OutputPort(0)) {
+        this->frameOut_out(0, this->distance, this->flux, this->temp);
+    }
 };
+
+void TfLunaManager::CONTROL_cmdHandler(FwOpcodeType opCode,
+                                       U32 cmdSeq,
+                                       Mars::TfLunaControlAction action) {
+    switch (action.e) {
+        case Mars::TfLunaControlAction::START:
+            this->enabled = true;
+            break;
+        case Mars::TfLunaControlAction::STOP:
+            this->enabled = false;
+            break;
+        case Mars::TfLunaControlAction::RESET_PARSER:
+            this->distance = 0;
+            this->flux = 0;
+            this->temp = 0;
+            break;
+        default:
+            this->cmdResponse_out(opCode, cmdSeq, Fw::CmdResponse::VALIDATION_ERROR);
+            return;
+    }
+
+    this->log_ACTIVITY_LO_ControlActionApplied(action);
+    this->cmdResponse_out(opCode, cmdSeq, Fw::CmdResponse::OK);
+}
 
 
 

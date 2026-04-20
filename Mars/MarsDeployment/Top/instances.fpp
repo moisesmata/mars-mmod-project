@@ -46,10 +46,7 @@ module Mars {
     stack size Default.STACK_SIZE \
     priority 40
 
-  #instance marsAnalyzer: Mars.MarsAnalyzer base id 0x10005000 \
-  #  queue size Default.QUEUE_SIZE \
-  #  stack size Default.STACK_SIZE \
-  #  priority 39
+  instance marsAnalyzer: Mars.MarsAnalyzer base id 0x10005000 \
 
   # ----------------------------------------------------------------------
   # Queued component instances

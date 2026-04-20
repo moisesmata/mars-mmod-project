@@ -32,7 +32,7 @@ module Mars {
     instance timer
     instance comDriver
     instance cmdSeq
-    #instance marsAnalyzer
+    instance marsAnalyzer
     instance tfLunaManager
     instance lidarI2cDriver
 
@@ -131,11 +131,10 @@ module Mars {
     }
 
     connections MarsDeployment {
-      # Application <-> Manager
-      #marsAnalyzer.managerControlOut -> tfLunaManager.controlIn
-      #tfLunaManager.frameOut -> marsAnalyzer.managerFrameIn
+      # Manager -> Analyzer (every cycle, decoded frame)
+      tfLunaManager.frameOut -> marsAnalyzer.managerFrameIn
 
-      # Manager <-> Linux UART driver
+      # Manager <-> Linux I2C driver
       tfLunaManager.read -> lidarI2cDriver.read
       tfLunaManager.write -> lidarI2cDriver.write
 

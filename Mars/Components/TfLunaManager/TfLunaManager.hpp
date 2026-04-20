@@ -71,16 +71,21 @@ class TfLunaManager final : public TfLunaManagerComponentBase {
     Drv::I2cStatus setupReadRegister(U8 reg);
     Drv::I2cStatus readRegisterBlock(U8 startRegister, Fw::Buffer &buffer);
 
-    void run_handler(FwIndexType portNum, U32 context);
+    void run_handler(FwIndexType portNum, U32 context) override;
+
+    //! Handler for the CONTROL command (START / STOP / RESET_PARSER)
+    void CONTROL_cmdHandler(FwOpcodeType opCode,
+                            U32 cmdSeq,
+                            Mars::TfLunaControlAction action) override;
 
     bool getData();
 
-   
   private:
-    U8 MAX_DATA_SIZE_BYTES = 8;
-    U8 distance;
-    U8 temp;
-    U8 flux;
+    static constexpr U8 MAX_DATA_SIZE_BYTES = 8;
+    U16 distance = 0;
+    U16 flux = 0;
+    I16 temp = 0;
+    bool enabled = true;
 
 };
 
