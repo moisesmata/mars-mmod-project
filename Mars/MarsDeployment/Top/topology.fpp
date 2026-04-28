@@ -110,10 +110,11 @@ module Mars {
       rateGroup1.RateGroupMemberOut[2] -> systemResources.run
       rateGroup1.RateGroupMemberOut[3] -> ComCcsds.comQueue.run
       rateGroup1.RateGroupMemberOut[4] -> ComCcsds.aggregator.timeout
+      rateGroup1.RateGroupMemberOut[5] -> cmdSeq.schedIn
 
       # Rate group 2
       rateGroupDriver.CycleOut[Ports_RateGroups.rateGroup2] -> rateGroup2.CycleIn
-      rateGroup2.RateGroupMemberOut[0] -> cmdSeq.schedIn
+      
 
       # Rate group 3
       rateGroupDriver.CycleOut[Ports_RateGroups.rateGroup3] -> rateGroup3.CycleIn
@@ -137,8 +138,8 @@ module Mars {
       # Manager <-> Linux I2C driver
       tfLunaManager.read -> lidarI2cDriver.read
       tfLunaManager.write -> lidarI2cDriver.write
-
-      rateGroup1.RateGroupMemberOut[5] -> tfLunaManager.run
+      rateGroup2.RateGroupMemberOut[0] -> tfLunaManager.run
+      
     }
 
   }

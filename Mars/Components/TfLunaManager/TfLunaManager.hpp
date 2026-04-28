@@ -71,6 +71,8 @@ class TfLunaManager final : public TfLunaManagerComponentBase {
     Drv::I2cStatus setupReadRegister(U8 reg);
     Drv::I2cStatus readRegisterBlock(U8 startRegister, Fw::Buffer &buffer);
 
+    void configure_fr(U16 frequency);
+
     void run_handler(FwIndexType portNum, U32 context) override;
 
     //! Handler for the CONTROL command (START / STOP)

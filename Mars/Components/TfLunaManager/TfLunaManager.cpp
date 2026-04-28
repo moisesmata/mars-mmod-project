@@ -32,8 +32,19 @@ Drv::I2cStatus TfLunaManager::readRegisterBlock(U8 startRegister, Fw::Buffer &bu
     return status;
 }
 
+// Configure the TfLuna to have a certain frequency
+void TfLunaManager::configure_fr(U16 frequency){ 
+    U8 low = frequency & 0xFF; // and with 256, giving us the lower 8 bits
+    Fw::Buffer low_buffer(&low, sizeof low);
+    this->write_out(0,FPS_LOW, low_buffer);
+
+    U8 high = frequency >> 8; // shift right by 8, getting the upper 8 bits
+    Fw::Buffer high_buffer(&low, sizeof low);
+    this->write_out(0,FPS_HIGH, high_buffer);
+};
+
 bool TfLunaManager::getData(){
-    U8 data[MAX_DATA_SIZE_BYTES];
+    U8 data[MAX_DATA_SIZE_BYTES]; // Max data size = 8
     Fw::Buffer buffer(data, sizeof(data));
 
     Drv::I2cStatus status = this->readRegisterBlock(DIST_LOW, buffer);
