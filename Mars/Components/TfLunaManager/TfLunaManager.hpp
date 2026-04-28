@@ -83,7 +83,7 @@ class TfLunaManager final : public TfLunaManagerComponentBase {
     bool getData();
 
   private:
-    static constexpr U8 MAX_DATA_SIZE_BYTES = 8;
+    static constexpr U8 MAX_DATA_SIZE_BYTES = 6;
     U16 distance = 0;
     U16 flux = 0;
     I16 temp = 0;
