@@ -48,7 +48,7 @@ void configureTopology() {
     rateGroup2.configure(rateGroup2Context, FW_NUM_ARRAY_ELEMENTS(rateGroup2Context));
     rateGroup3.configure(rateGroup3Context, FW_NUM_ARRAY_ELEMENTS(rateGroup3Context));
 
-    tfLunaManager.configure_fr(100); // Set the frequency to 100 hz
+    //tfLunaManager.configure_fr(100); // Set the frequency to 100 hz
 
     // Command sequencer needs to allocate memory to hold contents of command sequences
     cmdSeq.allocateBuffer(0, mallocator, 5 * 1024);
