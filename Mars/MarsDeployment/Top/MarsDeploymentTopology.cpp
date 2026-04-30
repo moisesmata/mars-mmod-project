@@ -18,8 +18,8 @@ namespace Mars {
 // Instantiate a malloc allocator for cmdSeq buffer allocation
 Fw::MallocAllocator mallocator;
 
-// The reference topology divides the incoming clock signal (1Hz) into sub-signals: 1Hz, 1/2Hz, and 1/4Hz with 0 offset
-Svc::RateGroupDriver::DividerSet rateGroupDivisorsSet{{{1, 0}, {2, 0}, {4, 0}}};
+// The reference topology divides the incoming clock signal (100Hz) into sub-signals: 1Hz, 100Hz, and 1/2Hz with 0 offset
+Svc::RateGroupDriver::DividerSet rateGroupDivisorsSet{{{100, 0}, {1, 0}, {200, 0}}};
 
 // Rate groups may supply a context token to each of the attached children whose purpose is set by the project. The
 // reference topology sets each token to zero as these contexts are unused in this project.
@@ -29,12 +29,8 @@ U32 rateGroup3Context[Svc::ActiveRateGroup::CONNECTION_COUNT_MAX] = {};
 
 enum TopologyConstants {
     COMM_PRIORITY = 34,
-    LIDAR_UART_PRIORITY = 35,
-    LIDAR_UART_ALLOCATION_SIZE = 1024,
 };
 
-const char* LIDAR_UART_DEVICE = "/dev/ttyUSB0";
-bool g_lidarUartStarted = false;
 
 /**
  * \brief configure/setup components in project-specific way
@@ -51,6 +47,8 @@ void configureTopology() {
     rateGroup1.configure(rateGroup1Context, FW_NUM_ARRAY_ELEMENTS(rateGroup1Context));
     rateGroup2.configure(rateGroup2Context, FW_NUM_ARRAY_ELEMENTS(rateGroup2Context));
     rateGroup3.configure(rateGroup3Context, FW_NUM_ARRAY_ELEMENTS(rateGroup3Context));
+
+    //tfLunaManager.configure_fr(100); // Set the frequency to 100 hz
 
     // Command sequencer needs to allocate memory to hold contents of command sequences
     cmdSeq.allocateBuffer(0, mallocator, 5 * 1024);
@@ -70,15 +68,9 @@ void setupTopology(const TopologyState& state) {
     if (state.hostname != nullptr && state.port != 0) {
         comDriver.configure(state.hostname, state.port);
     }
-    // Configure and start the TF-Luna UART driver.
-    if (lidarUartDriver.open(LIDAR_UART_DEVICE,
-                             Drv::LinuxUartDriver::UartBaudRate::BAUD_115K,
-                             Drv::LinuxUartDriver::UartFlowControl::NO_FLOW,
-                             Drv::LinuxUartDriver::UartParity::PARITY_NONE,
-                             LIDAR_UART_ALLOCATION_SIZE)) {
-        lidarUartDriver.start(LIDAR_UART_PRIORITY, Default::STACK_SIZE);
-        g_lidarUartStarted = true;
-    }
+
+    lidarI2cDriver.open("/dev/i2c-1");
+
     // Project-specific component configuration. Function provided above. May be inlined, if desired.
     configureTopology();
     // Autocoded parameter loading. Function provided by autocoder.
@@ -113,12 +105,6 @@ void teardownTopology(const TopologyState& state) {
     // Other task clean-up.
     comDriver.stop();
     (void)comDriver.join();
-
-    if (g_lidarUartStarted) {
-        lidarUartDriver.quitReadThread();
-        (void)lidarUartDriver.join();
-        g_lidarUartStarted = false;
-    }
 
     // Resource deallocation
     cmdSeq.deallocateBuffer(mallocator);

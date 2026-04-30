@@ -17,39 +17,24 @@ MarsAnalyzer::MarsAnalyzer(const char* const compName) : MarsAnalyzerComponentBa
 MarsAnalyzer::~MarsAnalyzer() {}
 
 // ----------------------------------------------------------------------
-// Handler implementations for commands
+// Handler implementations for typed input ports
 // ----------------------------------------------------------------------
-
-void MarsAnalyzer::START_cmdHandler(FwOpcodeType opCode, U32 cmdSeq) {
-    if (this->isConnected_managerControlOut_OutputPort(0)) {
-        this->managerControlOut_out(0, TfLunaControlAction::START);
-    }
-    this->cmdResponse_out(opCode, cmdSeq, Fw::CmdResponse::OK);
-}
-
-void MarsAnalyzer::STOP_cmdHandler(FwOpcodeType opCode, U32 cmdSeq) {
-    if (this->isConnected_managerControlOut_OutputPort(0)) {
-        this->managerControlOut_out(0, TfLunaControlAction::STOP);
-    }
-    this->cmdResponse_out(opCode, cmdSeq, Fw::CmdResponse::OK);
-}
-
-void MarsAnalyzer::RESET_PARSER_cmdHandler(FwOpcodeType opCode, U32 cmdSeq) {
-    if (this->isConnected_managerControlOut_OutputPort(0)) {
-        this->managerControlOut_out(0, TfLunaControlAction::RESET_PARSER);
-    }
-    this->cmdResponse_out(opCode, cmdSeq, Fw::CmdResponse::OK);
-}
 
 void MarsAnalyzer::managerFrameIn_handler(FwIndexType portNum,
                                           U16 distanceCm,
                                           U16 signalStrength,
                                           I16 temperatureCentiC) {
-    static_cast<void>(portNum);
-    // Mission-specific application logic belongs here.
-    static_cast<void>(distanceCm);
-    static_cast<void>(signalStrength);
-    static_cast<void>(temperatureCentiC);
+
+    this->tlmWrite_LastDistanceCm(distanceCm);
+
+    Fw::ParamValid valid = Fw::ParamValid::INVALID;
+    const U16 threshold = this->paramGet_MmodThresholdCm(valid);
+
+    if (distanceCm > 0 && distanceCm <= threshold) {
+        this->mmodCount++;
+        this->tlmWrite_MmodCount(this->mmodCount);
+        this->log_WARNING_HI_MmodDetected(distanceCm);
+    }
 }
 
 }  // namespace Mars

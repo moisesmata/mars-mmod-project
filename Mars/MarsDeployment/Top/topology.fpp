@@ -34,7 +34,7 @@ module Mars {
     instance cmdSeq
     instance marsAnalyzer
     instance tfLunaManager
-    instance lidarUartDriver
+    instance lidarI2cDriver
 
   # ----------------------------------------------------------------------
   # Pattern graph specifiers
@@ -110,10 +110,11 @@ module Mars {
       rateGroup1.RateGroupMemberOut[2] -> systemResources.run
       rateGroup1.RateGroupMemberOut[3] -> ComCcsds.comQueue.run
       rateGroup1.RateGroupMemberOut[4] -> ComCcsds.aggregator.timeout
+      rateGroup1.RateGroupMemberOut[5] -> cmdSeq.schedIn
 
       # Rate group 2
       rateGroupDriver.CycleOut[Ports_RateGroups.rateGroup2] -> rateGroup2.CycleIn
-      rateGroup2.RateGroupMemberOut[0] -> cmdSeq.schedIn
+      
 
       # Rate group 3
       rateGroupDriver.CycleOut[Ports_RateGroups.rateGroup3] -> rateGroup3.CycleIn
@@ -131,20 +132,14 @@ module Mars {
     }
 
     connections MarsDeployment {
-      # Application <-> Manager
-      marsAnalyzer.managerControlOut -> tfLunaManager.controlIn
+      # Manager -> Analyzer (every cycle, decoded frame)
       tfLunaManager.frameOut -> marsAnalyzer.managerFrameIn
 
-      # Manager <-> Linux UART driver
-      lidarUartDriver.$recv -> tfLunaManager.lidarDataIn
-      tfLunaManager.lidarDataReturnOut -> lidarUartDriver.recvReturnIn
-      lidarUartDriver.ready -> tfLunaManager.lidarDriverReady
-
-      # UART driver memory and telemetry/event integration
-      lidarUartDriver.allocate -> ComCcsds.commsBufferManager.bufferGetCallee
-      lidarUartDriver.deallocate -> ComCcsds.commsBufferManager.bufferSendIn
-
-      rateGroup1.RateGroupMemberOut[5] -> lidarUartDriver.run
+      # Manager <-> Linux I2C driver
+      tfLunaManager.read -> lidarI2cDriver.read
+      tfLunaManager.write -> lidarI2cDriver.write
+      rateGroup2.RateGroupMemberOut[0] -> tfLunaManager.run
+      
     }
 
   }
